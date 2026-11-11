@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 热点雷达 | 热点话题监测看板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-white">
+
+    <!-- 动态渐变背景 -->
+    <div class="fixed inset-0 overflow-hidden -z-10">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute top-0 left-1/2 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div class="absolute top-0 left-3/4 w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div class="absolute -top-48 left-96 w-96 h-96 bg-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute -top-48 left-1/2 w-96 h-96 bg-rose-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div class="absolute -top-48 left-3/4 w-96 h-96 bg-amber-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                        <i class="fas fa-radar text-white text-sm"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-white bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-400">
+                        AI 热点雷达
+                    </span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 backdrop-blur-sm rounded-full border border-slate-700 text-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-emerald-400">系统运行中</span>
+                    </div>
+                    <button onclick="refreshData()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all border border-slate-700 flex items-center gap-2">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>刷新数据</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- 主内容 -->
+    <main class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        
+        <!-- 欢迎区域 -->
+        <div class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400">
+                实时热点监测
+            </h1>
+            <p class="text-slate-400 text-sm">
+                基于 OpenRouter AI 智能分析 · 多源数据聚合 · 情感倾向识别
+            </p>
+        </div>
+        <!-- 统计卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 hover:border-cyan-500/50 transition-all group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium">监测热点总数</p>
+                        <h3 class="text-2xl font-bold text-white mt-1" id="stat-total">0</h3>
+                    </div>
+                    <div class="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500/20 transition-all">
+                        <i class="fas fa-hashtag"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs text-slate-500">
+                    <i class="fas fa-arrow-up text-emerald-400 mr-1"></i>
+                    <span>较昨日 +12%</span>
+                </div>
+            </div>
+            <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 hover:border-purple-500/50 transition-all group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium">平均热度得分</p>
+                        <h3 class="text-2xl font-bold text-white mt-1" id="stat-avg-heat">0</h3>
+                    </div>
+                    <div class="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-400 group-hover:bg-purple-500/20 transition-all">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs text-slate-500">
+                    <span>AI 已分析完成</span>
+                </div>
+            </div>
+            <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 hover:border-pink-500/50 transition-all group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium">正面情感占比</p>
+                        <h3 class="text-2xl font-bold text-white mt-1" id="stat-positive">0%</h3>
+                    </div>
+                    <div class="w-10 h-10 bg-pink-500/10 rounded-lg flex items-center justify-center text-pink-400 group-hover:bg-pink-500/20 transition-all">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs text-slate-500">
+                    <i class="fas fa-chart-line text-slate-500 mr-1"></i>
+                    <span>情感趋势稳定</span>
+                </div>
+            </div>
+            <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 hover:border-amber-500/50 transition-all group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium">AI 洞察报告</p>
+                        <h3 class="text-2xl font-bold text-white mt-1">已生成</h3>
+                    </div>
+                    <div class="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-400 group-hover:bg-amber-500/20 transition-all">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                </div>
+                <button onclick="generateReport()" class="mt-4 w-full py-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg text-xs font-bold text-white hover:shadow-lg hover:shadow-amber-500/30 transition-all">
+                    查看 AI 报告
+                </button>
+            </div>
+        </div>
+        <!-- 主要内容区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- 左侧：热点列表 -->
+            <div class="lg:col-span-2">
+                <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
+                    <div class="p-6 border-b border-slate-700/50 flex items-center justify-between">
+                        <h2 class="flex items-center gap-2 text-lg font-bold text-white">
+                            <i class="fas fa-list text-cyan-400"></i>
+                            热点话题列表
+                        </h2>
+                        <span class="px-3 py-1 bg-slate-700/50 rounded-full text-xs text-slate-300 font-mono" id="update-time">--:--:--</span>
+                    </div>
+                    <div class="p-0" id="hotspots-container">
+                        <!-- 热点卡片将通过 JS 注入 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：图表 -->
+            <div class="lg:col-span-1">
+                <div class="space-y-6">
+                    <!-- 热度趋势图 -->
+                    <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6">
+                        <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-chart-area text-cyan-400"></i>
+                            热度趋势 (7天)
+                        </h3>
+                        <div class="h-64">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 分类分布 -->
+                    <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6">
+                        <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-pie-chart text-purple-400"></i>
+                            分类分布
+                        </h3>
+                        <div class="h-64">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- AI 洞察报告模态框 -->
+        <div id="report-modal" class="fixed inset-0 z-[60] hidden">
+            <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-sm" onclick="closeReportModal()"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-4">
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl shadow-cyan-500/10">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-robot text-cyan-400"></i>
+                            AI 每日洞察报告
+                        </h3>
+                        <button onclick="closeReportModal()" class="text-slate-400 hover:text-white">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="prose prose-slate max-w-none text-slate-300" id="report-content">
+                        <p class="text-center text-slate-500 mt-10">点击左上角"查看 AI 报告"按钮生成报告...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <script src="js/app.js"></script>
+</body>
+</html>

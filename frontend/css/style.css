@@ -1,0 +1,137 @@
+/* AI 热点雷达 - 自定义样式 */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+    --gradient-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+}
+
+/* 动态背景动画 */
+@keyframes blob {
+    0% {
+        transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+        transform: translate(0px, 0px) scale(1);
+    }
+}
+
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
+}
+
+/* 热点卡片动画 */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hotspot-card {
+    animation: slideIn 0.5s ease-out forwards;
+}
+
+.hotspot-card:nth-child(1) { animation-delay: 0.1s; }
+.hotspot-card:nth-child(2) { animation-delay: 0.2s; }
+.hotspot-card:nth-child(3) { animation-delay: 0.3s; }
+.hotspot-card:nth-child(4) { animation-delay: 0.4s; }
+.hotspot-card:nth-child(5) { animation-delay: 0.5s; }
+
+/* 热度条 */
+.heat-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6, #ec4899);
+    background-size: 200% 100%;
+    animation: heatMove 3s linear infinite;
+}
+
+@keyframes heatMove {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* 情感标签 */
+.sentiment-positive { color: #10b981; }
+.sentiment-neutral { color: #6b7280; }
+.sentiment-negative { color: #ef4444; }
+
+/* 卸载加载器 */
+.loader {
+    border: 3px solid #1f2937;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 模态框动画 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#report-modal {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Chart.js 响应式 */
+#trendChart, #categoryChart {
+    max-height: 300px;
+}
+
+/* 焦点样式 */
+button:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .hotspot-card {
+        margin-bottom: 1rem;
+    }
+}
